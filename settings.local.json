@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout:*)",
+      "Bash(.claude/scripts/export-conversation.sh:*)",
+    ],
+    "deny": [],
+    "ask": []
+  },
+  "hooks": {
+    "SessionEnd": [
+      {
+        "matcher": "logout|prompt_input_exit|other",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "timeout 10 \"$CLAUDE_PROJECT_DIR\"/.claude/scripts/export-conversation.sh",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

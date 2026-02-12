@@ -20,8 +20,7 @@ Create the following structure in your project root directory:
 │   └── export-conversation.py    # Python export script
 ├── settings.local.json            # Claude Code configuration file
 └── history/                      # Export directory (auto-created)
-    ├── index.md
-    └── .exported_state
+    └── index.md
 ```
 
 ### 3. Script Files
@@ -33,7 +32,8 @@ Save the following content to `.claude/scripts/export-conversation.sh`:
 ```bash
 #!/bin/bash
 # Wrapper script - delegates to Python for all logic
-python3 /home/han/Documents/han_vault/.claude/scripts/export-conversation.py "$@"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+python3 "$SCRIPT_DIR/export-conversation.py" "$@"
 ```
 
 **Set execute permission**:
@@ -144,7 +144,7 @@ Update index.md index
 - ✅ **Complete Content**: Preserves user messages, assistant replies, tool calls
 - ✅ **YAML frontmatter**: Supports tags, dates, metadata
 - ✅ **Auto Index**: Updates index.md to record all conversations
-- ✅ **Deduplication**: Avoids exporting the same session multiple times
+- ✅ **Update on Re-export**: Deletes old files and re-exports on session end
 
 ---
 
@@ -155,7 +155,6 @@ Update index.md index
 ```
 .claude/history/
 ├── index.md                          # Global conversation index
-├── .exported_state                   # Exported session list (for deduplication)
 └── YYYY/                             # Organized by year
     └── MM-DD/                        # Organized by month-day
         ├── {session-id-a}.md
@@ -272,7 +271,6 @@ Core functionality:
 
 ### Export Files
 - `.claude/history/index.md` - Global conversation index
-- `.claude/history/.exported_state` - Exported session records (for deduplication)
 - `.claude/history/YYYY/MM-DD/{session-id}.md` - Specific conversation files
 
 ## Troubleshooting

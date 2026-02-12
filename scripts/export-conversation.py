@@ -320,6 +320,34 @@ def update_index(output_dir: Path, session_id: str, metadata: Dict[str, Any]) ->
         f.writelines(index_content)
 
 
+def delete_old_conversation(output_dir: Path, session_id: str) -> None:
+    """Delete old conversation files and index entries for the given session_id."""
+    index_path = output_dir / 'index.md'
+
+    # Remove from index if exists
+    if index_path.exists():
+        with open(index_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        # Filter out lines containing the session_id
+        new_lines = [line for line in lines if session_id not in line]
+
+        # Write back if changed
+        if len(new_lines) < len(lines):
+            with open(index_path, 'w', encoding='utf-8') as f:
+                f.writelines(new_lines)
+            print(f"Deleted from index: {session_id}", file=sys.stderr)
+
+    # Delete old markdown file
+    for date_dir in sorted(output_dir.glob('*/*-*')):
+        if not date_dir.is_dir():
+            continue
+        old_file = date_dir / f"{session_id}.md"
+        if old_file.exists():
+            old_file.unlink()
+            print(f"Deleted old: {old_file}", file=sys.stderr)
+
+
 def save_conversation(
     markdown: str,
     output_dir: str,
@@ -371,16 +399,13 @@ def main():
             return 1
 
         output_dir = f"{cwd}/.claude/history"
-        state_file = f"{output_dir}/.exported_state"
+        output_path = Path(output_dir)
 
         # Create export directory
-        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        output_path.mkdir(parents=True, exist_ok=True)
 
-        # Check if already exported
-        if Path(state_file).exists():
-            with open(state_file, 'r') as f:
-                if session_id in f.read():
-                    return 0
+        # Delete old conversation file if exists
+        delete_old_conversation(output_path, session_id)
 
         # Export if transcript exists
         if transcript_path and Path(transcript_path).exists():
@@ -397,10 +422,6 @@ def main():
                 metadata['tags'] = extract_tags(messages)
                 markdown = to_markdown(messages, metadata)
                 save_conversation(markdown, output_dir, session_id, metadata)
-
-        # Record as exported
-        with open(state_file, 'a') as f:
-            f.write(f"{session_id}\n")
 
         return 0
 

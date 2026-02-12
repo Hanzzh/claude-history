@@ -1,7 +1,10 @@
-# Claude Code Conversation Auto-Export
+# Claude Code Conversation History
 
-Automatically export conversations to Markdown files when exiting Claude Code.
+> "Claude, what did we work on yesterday?"
 
+Give Claude Code long-term memory. Automatically export every conversation to Markdown, then search and reference them anytime.
+
+![claude-history](./assets/claude-history-en.png)
 ## Installation & Configuration
 
 ### 1. Requirements
@@ -73,7 +76,31 @@ Edit `.claude/settings.local.json` and add `hooks` and `permissions` configurati
 - `matcher` - Match all exit methods (Ctrl+D, exit, logout)
 - `async: true` - Execute asynchronously without blocking exit process
 
-### 5. Usage
+### 5. Optional: Install Skills
+
+Skills enable Claude Code to proactively search your conversation history.
+
+```bash
+# Create skills directory
+mkdir -p .claude/skills/search-history
+
+# Download search-history skill
+curl -o .claude/skills/search-history/SKILL.md \
+  https://raw.githubusercontent.com/Hanzzh/claude-history/main/skills/search-history/SKILL.md
+```
+
+**What it does**: When you ask about something discussed before, Claude Code will:
+- Detect time range from your query (yesterday, a few days ago, etc.)
+- Search `.claude/history/` for relevant conversations
+- Summarize previous discussions and relate them to your current question
+
+**Example usage**:
+```
+You: What did we work on yesterday?
+You: How did we handle that state management decision?
+```
+
+### 6. Usage
 
 #### Enable Auto-Export
 

@@ -9,9 +9,24 @@ Automatically export conversations to Markdown files when exiting Claude Code.
 - **Python 3.x** - Scripts require Python 3 environment
 - **Claude Code CLI** - Claude Code command-line tool must be installed
 
-### 2. Directory Structure
+### 2. Download Script Files
 
-Create the following structure in your project root directory:
+```bash
+# Create directory
+mkdir -p .claude/scripts
+
+# Download script files from GitHub
+curl -o .claude/scripts/export-conversation.sh \
+  https://raw.githubusercontent.com/Hanzzh/claude-history/main/scripts/export-conversation.sh
+
+curl -o .claude/scripts/export-conversation.py \
+  https://raw.githubusercontent.com/Hanzzh/claude-history/main/scripts/export-conversation.py
+
+# Set execute permission
+chmod +x .claude/scripts/export-conversation.sh
+```
+
+### 3. Expected Directory Structure
 
 ```
 .claude/
@@ -22,38 +37,6 @@ Create the following structure in your project root directory:
 └── history/                      # Export directory (auto-created)
     └── index.md
 ```
-
-### 3. Script Files
-
-#### export-conversation.sh
-
-Save the following content to `.claude/scripts/export-conversation.sh`:
-
-```bash
-#!/bin/bash
-# Wrapper script - delegates to Python for all logic
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-python3 "$SCRIPT_DIR/export-conversation.py" "$@"
-```
-
-**Set execute permission**:
-```bash
-chmod +x .claude/scripts/export-conversation.sh
-```
-
-#### export-conversation.py
-
-Save the complete Python export script to `.claude/scripts/export-conversation.py`.
-
-The script includes the following core features:
-- Parse JSONL format conversation records
-- Extract message content (user, assistant, tool calls)
-- Generate titles and tags
-- Convert to Markdown with YAML frontmatter
-- Organize file structure by date
-- Update global index
-
-> 💡 **Tip**: For the complete Python script content, refer to the project source files.
 
 ### 4. Configuration File
 
